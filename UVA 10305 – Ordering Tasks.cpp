@@ -10,45 +10,41 @@
   Sample Output : [1, 4, 2, 5, 3]
 */
 
-
+vector<int> executionOrder(vector<int>& input) {
+    int n = input[0];
+    int m = input[1];
+    int counter = 2;
+    vector<vector<int>> graph(n + 1);
+    vector<int> inDegree(n + 1, 0);
+    for (int i = 0; i < m; i++) {
+        int src = input[counter];     // 2
+        int dst = input[counter + 1]; // 3
+        graph[src].push_back(dst);
+        inDegree[dst]++;
+        counter += 2; // 4
+    }
+    return topoSort(graph, inDegree, n);
+}
 vector<int> topoSort(vector<vector<int>>& graph, vector<int>& inDegree, int n) {
+    int V = n + 1;
     queue<int> q;
-    vector<int> order;
-
-    // Push all nodes with 0 in-degree
-    for(int i = 1; i <= n; i++) {
-        if(inDegree[i] == 0) q.push(i);
+    vector<int> res;
+    for (int i = 1; i < V; i++) {
+        if (inDegree[i] == 0)
+            q.push(i);
     }
 
-    while(!q.empty()) {
-        int node = q.front(); q.pop();
-        order.push_back(node);
-
-        for(int nei : graph[node]) {
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        res.push_back(node);
+        for (auto nei : graph[node]) {
             inDegree[nei]--;
-            if(inDegree[nei] == 0) {
+            if (inDegree[nei] == 0) {
                 q.push(nei);
             }
         }
     }
 
-    return order;
-}
-
-vector<int> executionOrder(vector<int>& input) {
-    int n = input[0];
-    int m = input[1];
-    int counter = 2;
-
-    vector<vector<int>> graph(n+1); // 1-indexed
-    vector<int> inDegree(n+1, 0);
-
-    for(int i = 0; i < m; i++) {
-        int u = input[counter], v = input[counter+1];
-        graph[u].push_back(v);
-        inDegree[v]++;
-        counter += 2;
-    }
-
-    return topoSort(graph, inDegree, n);
+    return res.size() == n ? res : vector<int>();
 }
